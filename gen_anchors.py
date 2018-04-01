@@ -64,11 +64,11 @@ def write_anchors_to_file(centroids, annotation_dims, anchor_file):
     print()
 
 
-def kmeans(annotation_dims, centroids, anchor_file):
+def k_means(annotation_dims, centroids, anchor_file):
     num_annotations = annotation_dims.shape[0]
-    k, dim = centroids.shape
-    prev_assignments = np.ones(num_annotations)*(-1)
-    old_distance = np.zeros((num_annotations, k))
+    k, _ = centroids.shape
+    prev_assignments = None
+    old_distances = np.zeros((num_annotations, k))
 
     count = 0
     while True:
@@ -76,9 +76,8 @@ def kmeans(annotation_dims, centroids, anchor_file):
         for i in range(num_annotations):
             distance = 1 - iou(annotation_dims[i], centroids)
             distances.append(distance)
-        distances = np.array(distances)  # shape: (N,k)
 
-        print("iter {}: dists = {}".format(count, np.sum(np.abs(old_distance-distances))))
+        print("iter {}: dists = {}, diff = {}".format(count, np.sum(distances), np.sum(old_distances-distances)))
 
         # assign samples to centroids
         assignments = np.argmin(distances, axis=1)
@@ -89,14 +88,14 @@ def kmeans(annotation_dims, centroids, anchor_file):
             return
 
         # calculate new centroids
-        centroid_sums = np.zeros((k, dim), np.float)
+        centroid_sums = np.zeros_like(centroids)
         for i in range(num_annotations):
             centroid_sums[assignments[i]] += annotation_dims[i]
         for j in range(k):
             centroids[j] = centroid_sums[j]/(np.sum(assignments == j))
 
-        prev_assignments = assignments.copy()
-        old_distance = distances.copy()
+        prev_assignments = np.copy(assignments)
+        old_distances = np.copy(distances)
 
         count += 1
 
@@ -143,13 +142,13 @@ def main():
 
             indices = [random.randrange(annotation_dims.shape[0]) for _ in range(num_clusters)]
             centroids = annotation_dims[indices]
-            kmeans(annotation_dims, centroids, anchor_file)
+            k_means(annotation_dims, centroids, anchor_file)
             print('centroids.shape', centroids.shape)
     else:
         anchor_file = os.path.join(args.output_dir, 'anchors%d.txt' % args.num_clusters)
         indices = [random.randrange(annotation_dims.shape[0]) for _ in range(args.num_clusters)]
         centroids = annotation_dims[indices]
-        kmeans(annotation_dims, centroids, anchor_file)
+        k_means(annotation_dims, centroids, anchor_file)
         print('centroids.shape', centroids.shape)
 
 

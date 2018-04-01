@@ -12,9 +12,9 @@ def main(argv):
     args = parser.parse_args()
     args.output_file = args.input_file.replace(".txt",".png")
 
-    print("input file you provided is {}".format(args.input_file))
+    print "input file you provided is {}".format(args.input_file)
 
-    print("output file you provided is {}".format(args.output_file))
+    print "output file you provided is {}".format(args.output_file)
     f = open(args.input_file)    
 
     lines = [line.rstrip("\n") for line in f.readlines()]
@@ -31,9 +31,9 @@ def main(argv):
         precisions.append(float(cols[1]))
         recalls.append(float(cols[2]))
 
-    print(iters)
-    print(precisions)
-    print(recalls)
+    print iters
+    print precisions
+    print recalls
 
     fig= plt.figure()
     ax = fig.add_subplot(111)
