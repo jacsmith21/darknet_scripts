@@ -11,7 +11,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("anchors list you provided{}".format(args.anchor_dir))
+    print("anchors list you provided: {}".format(args.anchor_dir))
 
     h, w = (416, 416)
     stride = 32
